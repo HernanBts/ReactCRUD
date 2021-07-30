@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react'
 import { isEmpty, size } from 'lodash'
 import shortid from 'shortid'
-import { getCollection } from './actions'
+import { addDocument, deleteDocument, getCollection, updateDocument } from './actions'
 
 function App() {
   const [task, setTask] = useState("")      
@@ -13,12 +13,14 @@ function App() {
   useEffect(() => {
     (async () => {
       const result = await getCollection('tasks')
-      console.log(result)
+      if (result.statusResponse) {
+        setTasks(result.data)
+      }
     })()
   }, [])
 
   const validForm = () => {
-    let isValid = true;
+    let isValid = true
     setError(null)
 
     if (isEmpty(task)) {
@@ -28,21 +30,27 @@ function App() {
     return isValid
   }
 
-  const addTask = (e) => {
+  const addTask = async (e) => {
     e.preventDefault()
 
     if (!validForm()) return
     
-    const newTask = {
-      id: shortid.generate(),
-      name: task
+    const result = await addDocument('tasks', {name: task})
+    if (!result.statusResponse) {
+      setError(result.error)
+      return
     }
 
-    setTasks([...tasks, newTask])
+    setTasks([...tasks, {id: result.data.id, name: task}])
     setTask("")
   }
 
-  const deleteTask = (id) => {
+  const deleteTask = async(id) => {
+    const result = await deleteDocument('tasks', id)
+    if (!result.statusResponse) {
+      setError(result.error)
+      return
+    }
     const filteredTasks = tasks.filter(task => task.id !== id)
     setTasks(filteredTasks)
   }
@@ -53,11 +61,16 @@ function App() {
     setEditMode(true)
   }
 
-  const updateTask = (e) => {
+  const updateTask = async(e) => {
     e.preventDefault()
 
     if (!validForm()) return
     
+    const result = await updateDocument('tasks', id, {name: task})
+    if (!result.statusResponse) {
+      setError(result.error)
+      return
+    }
     const editedTasks = tasks.map(item => item.id === id ? {id, name: task}: item)
 
     setTasks(editedTasks)
@@ -85,7 +98,7 @@ function App() {
                     <button className="btn btn-danger btn-sm float-right mx-2" onClick={() => deleteTask(task.id)}>Delete</button>
                     <button className="btn btn-warning btn-sm float-right" onClick={() => editTask(task)}>Edit</button>
                   </li>
-                ))
+                )).sort(task.name)
               }
               </ul>
             )                           
