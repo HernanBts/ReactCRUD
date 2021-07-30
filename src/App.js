@@ -10,6 +10,7 @@ function App() {
   const [id, setId] = useState("")
   const [error, setError] = useState(null)
 
+  // Run at lunch
   useEffect(() => {
     (async () => {
       const result = await getCollection('tasks')
@@ -127,7 +128,7 @@ function App() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 export default App;
