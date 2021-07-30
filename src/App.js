@@ -98,7 +98,7 @@ function App() {
                     <button className="btn btn-danger btn-sm float-right mx-2" onClick={() => deleteTask(task.id)}>Delete</button>
                     <button className="btn btn-warning btn-sm float-right" onClick={() => editTask(task)}>Edit</button>
                   </li>
-                )).sort(task.name)
+                ))
               }
               </ul>
             )                           
