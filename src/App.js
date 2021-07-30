@@ -7,13 +7,23 @@ function App() {
   const [tasks, setTasks] = useState([])  
   const [editMode, setEditMode] = useState(false)
   const [id, setId] = useState("")
+  const [error, setError] = useState(null)
+
+  const validForm = () => {
+    let isValid = true;
+    setError(null)
+
+    if (isEmpty(task)) {
+      setError("you must enter a Task.")
+      isValid = false
+    }
+    return isValid
+  }
 
   const addTask = (e) => {
     e.preventDefault()
-    if (isEmpty(task)) {
-      console.log("Task Empty")
-      return
-    }
+
+    if (!validForm()) return
     
     const newTask = {
       id: shortid.generate(),
@@ -37,10 +47,8 @@ function App() {
 
   const updateTask = (e) => {
     e.preventDefault()
-    if (isEmpty(task)) {
-      console.log("Task Empty")
-      return
-    }
+
+    if (!validForm()) return
     
     const editedTasks = tasks.map(item => item.id === id ? {id, name: task}: item)
 
@@ -59,7 +67,7 @@ function App() {
           <h4 className="text-center">Tasks list</h4>
           {         
             size(tasks) == 0 ? (
-              <h5 className="text-center">Don´t find Tasks...</h5>     
+              <li className="list-group-item">Don´t find Tasks...</li>     
             ) : (
               <ul className="list-group">
               {
@@ -91,6 +99,9 @@ function App() {
               type="submit"      
                 > {editMode ? "Save" : "Add"}
             </button>
+            {
+              error && <span className="text-danger">{error}</span>
+            }
           </form>
         </div>
       </div>
